@@ -1093,6 +1093,126 @@ body {
   75% { transform: rotate(-5deg); }
 }
 
+/* --- B1 Syllabus Features: Routine, Challenges & Quiz Styles --- */
+
+/* Routine Checklist Checked State */
+.routine-item.completed {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+
+.routine-item.completed .goal-checkbox {
+  background: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+  color: white !important;
+}
+
+/* Logical Connectors Active Matching Badge */
+.connector-badge.active {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: var(--color-success) !important;
+  opacity: 1 !important;
+  font-weight: 700;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.15);
+}
+
+/* Interactive Grammar Quiz Panel */
+.quiz-container {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-md);
+  animation: slideDown 0.3s ease;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quiz-question {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.4;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-option-btn {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.quiz-option-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-glass-focus);
+  transform: translateX(3px);
+}
+
+.quiz-option-btn.correct {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: var(--color-success) !important;
+  color: #34d399 !important;
+  font-weight: 700;
+}
+
+.quiz-option-btn.wrong {
+  background: rgba(244, 63, 94, 0.15) !important;
+  border-color: var(--color-accent) !important;
+  color: #f87171 !important;
+  text-decoration: line-through;
+}
+
+.quiz-explanation {
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-info);
+  padding: 10px 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  animation: slideDown 0.2s ease;
+}
+
+/* Micro-animations for Monologue Chrono */
+@keyframes pulse-timer {
+  0% { transform: scale(1); text-shadow: 0 0 4px rgba(168, 85, 247, 0.2); }
+  50% { transform: scale(1.04); text-shadow: 0 0 12px rgba(168, 85, 247, 0.6); }
+  100% { transform: scale(1); text-shadow: 0 0 4px rgba(168, 85, 247, 0.2); }
+}
+
+.oral-timer-active {
+  animation: pulse-timer 1.2s infinite ease-in-out;
+  color: var(--color-secondary) !important;
+}
+
 /* --- Responsive Adjustments --- */
 @media (max-width: 1024px) {
   .app-container {

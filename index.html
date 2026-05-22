@@ -203,17 +203,120 @@
 
       <!-- Thematic Vocabulary Flashcards Panel -->
       <div style="display: flex; flex-direction: column; flex: 1; gap: 14px; overflow: hidden;">
-        <div class="tabs-header">
-          <button class="tab-btn active" id="vocab-tab-trigger">Vocabulaire</button>
-          <button class="tab-btn" id="grammar-tab-trigger">Grammaire</button>
+        <div class="tabs-header" style="gap: 6px;">
+          <button class="tab-btn active" id="vocab-tab-trigger" style="font-size: 11px; padding: 4px 6px;">Vocabulaire</button>
+          <button class="tab-btn" id="grammar-tab-trigger" style="font-size: 11px; padding: 4px 6px;">Grammaire</button>
+          <button class="tab-btn" id="delf-tab-trigger" style="font-size: 11px; padding: 4px 6px;">Défis DELF</button>
+          <button class="tab-btn" id="routine-tab-trigger" style="font-size: 11px; padding: 4px 6px;">Routine B1</button>
         </div>
 
-        <!-- Vocabulary Search -->
-        <input type="text" class="vocab-search" id="vocab-search-input" placeholder="Rechercher un mot...">
+        <!-- Vocab and Grammar content wrapper -->
+        <div id="vocab-grammar-tab-content" style="display: flex; flex-direction: column; flex: 1; gap: 14px; overflow: hidden;">
+          <!-- Vocabulary Search -->
+          <input type="text" class="vocab-search" id="vocab-search-input" placeholder="Rechercher un mot...">
 
-        <!-- Dynamic Flashcards Scroller -->
-        <div class="vocab-scroll-list" id="vocabulary-cards-list">
-          <!-- Loaded by JS -->
+          <!-- Dynamic Flashcards Scroller -->
+          <div class="vocab-scroll-list" id="vocabulary-cards-list">
+            <!-- Loaded by JS -->
+          </div>
+        </div>
+
+        <!-- DELF B1 Challenges content wrapper (Hidden by default) -->
+        <div id="delf-tab-content" style="display: none; flex-direction: column; flex: 1; gap: 16px; overflow-y: auto; padding-right: 4px;">
+          <!-- Writing challenge -->
+          <div class="delf-block" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <span class="vocab-category" style="color: var(--color-primary);"><i class="fa-solid fa-pen-nib"></i> Production Écrite (B1)</span>
+            <div style="font-size: 12px; font-weight: 700; color: white; line-height: 1.4;">Sujet : Pensez-vous que le télétravail soit bénéfique pour la société ? Rédigez un avis argumenté (160 mots min).</div>
+            <textarea id="delf-essay-input" class="vocab-search" style="height: 140px; resize: none; font-family: inherit; line-height: 1.4; padding: 10px; margin-top: 6px; font-size: 13px;" placeholder="Rédigez votre essai en français ici..."></textarea>
+            
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+              <span>Mots : <strong id="essay-word-count" style="color: var(--color-primary);">0</strong> / 160+</span>
+              <span id="essay-status-label" style="font-weight: 700; color: var(--color-accent);">Incomplet</span>
+            </div>
+
+            <!-- Connectors tracking -->
+            <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">Connecteurs logiques B1 requis :</div>
+            <div class="connectors-tracker" style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <span class="cmd-badge connector-badge" data-connector="cependant" style="font-size: 9px; padding: 2px 8px; opacity: 0.5;">cependant</span>
+              <span class="cmd-badge connector-badge" data-connector="de plus" style="font-size: 9px; padding: 2px 8px; opacity: 0.5;">de plus</span>
+              <span class="cmd-badge connector-badge" data-connector="pourtant" style="font-size: 9px; padding: 2px 8px; opacity: 0.5;">pourtant</span>
+              <span class="cmd-badge connector-badge" data-connector="par conséquent" style="font-size: 9px; padding: 2px 8px; opacity: 0.5;">par conséquent</span>
+              <span class="cmd-badge connector-badge" data-connector="d'ailleurs" style="font-size: 9px; padding: 2px 8px; opacity: 0.5;">d'ailleurs</span>
+            </div>
+
+            <button id="delf-essay-submit-btn" class="vocab-search" style="margin-top: 10px; background: var(--border-glass); color: var(--text-muted); border: none; font-weight: 700; cursor: not-allowed; transition: all var(--transition-fast); padding: 10px;" disabled>Valider l'essai (+50 XP)</button>
+          </div>
+
+          <!-- Oral simulation challenge -->
+          <div class="delf-block" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <span class="vocab-category" style="color: var(--color-secondary);"><i class="fa-solid fa-microphone"></i> Production Orale (B1)</span>
+            <div style="font-size: 12px; font-weight: 700; color: white; line-height: 1.4;">Sujet : Faut-il encourager le cyclisme urbain pour protéger l'environnement ? (Monologue de 1 min).</div>
+            
+            <div class="oral-timer-display" style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px; font-weight: 800; color: var(--color-secondary); margin: 6px 0; font-family: monospace;">
+              <i class="fa-solid fa-stopwatch"></i> <span id="oral-timer-text">00:00</span>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button id="oral-timer-toggle-btn" class="vocab-search" style="flex: 1; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px;"><i class="fa-solid fa-play"></i> Démarrer</button>
+              <button id="oral-timer-reset-btn" class="vocab-search" style="width: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 8px;"><i class="fa-solid fa-arrows-rotate"></i></button>
+            </div>
+
+            <textarea id="oral-transcript-display" class="vocab-search" style="height: 80px; resize: none; font-family: inherit; font-size: 12px; font-style: italic; line-height: 1.4; padding: 8px; margin-top: 6px;" placeholder="Parlez dans le micro (Speech-to-Text) pendant le chrono... La transcription vocale en direct s'affichera ici." readonly></textarea>
+            
+            <button id="delf-oral-submit-btn" class="vocab-search" style="margin-top: 6px; background: var(--border-glass); color: var(--text-muted); border: none; font-weight: 700; cursor: not-allowed; transition: all var(--transition-fast); padding: 10px;" disabled>Valider l'oral (+30 XP)</button>
+          </div>
+        </div>
+
+        <!-- Weekly Study Routine content wrapper (Hidden by default) -->
+        <div id="routine-tab-content" style="display: none; flex-direction: column; flex: 1; gap: 16px; overflow-y: auto; padding-right: 4px;">
+          <!-- Progress bar -->
+          <div class="progress-meter" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 12px; gap: 8px;">
+            <div class="progress-label-row">
+              <span style="font-size: 12px; font-weight: 700; color: white;">Routine Hebdomadaire B1</span>
+              <span id="routine-progress-percent" style="font-size: 12px; font-weight: 700; color: var(--color-success);">0%</span>
+            </div>
+            <div class="progress-track" style="height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: var(--radius-full); overflow: hidden; margin-top: 4px;">
+              <div class="progress-fill" id="routine-progress-fill" style="width: 0%; height: 100%; background: var(--gradient-success); border-radius: var(--radius-full); transition: width var(--transition-normal);"></div>
+            </div>
+          </div>
+
+          <!-- Routine tasks checkboxes -->
+          <div class="routine-checklist-container" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Lundi -->
+            <div class="routine-item" data-day="Lundi" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-md); background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); cursor: pointer; transition: all var(--transition-fast);">
+              <div class="goal-checkbox" id="checkbox-lundi" style="margin-top: 0; width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent;"><i class="fa-solid fa-check"></i></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 700; color: white;">Lundi : Grammaire</span>
+                <span style="font-size: 11px; color: var(--text-secondary);">Focus Subjonctif (Exercices et phrases)</span>
+              </div>
+            </div>
+            <!-- Mercredi -->
+            <div class="routine-item" data-day="Mercredi" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-md); background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); cursor: pointer; transition: all var(--transition-fast);">
+              <div class="goal-checkbox" id="checkbox-mercredi" style="margin-top: 0; width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent;"><i class="fa-solid fa-check"></i></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 700; color: white;">Mercredi : Écoute Active</span>
+                <span style="font-size: 11px; color: var(--text-secondary);">Podcast d'actualité (RFI / innerFrench)</span>
+              </div>
+            </div>
+            <!-- Vendredi -->
+            <div class="routine-item" data-day="Vendredi" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-md); background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); cursor: pointer; transition: all var(--transition-fast);">
+              <div class="goal-checkbox" id="checkbox-vendredi" style="margin-top: 0; width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent;"><i class="fa-solid fa-check"></i></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 700; color: white;">Vendredi : Écriture</span>
+                <span style="font-size: 11px; color: var(--text-secondary);">Avis rédigé sur un forum (160 mots)</span>
+              </div>
+            </div>
+            <!-- Dimanche -->
+            <div class="routine-item" data-day="Dimanche" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-md); background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); cursor: pointer; transition: all var(--transition-fast);">
+              <div class="goal-checkbox" id="checkbox-dimanche" style="margin-top: 0; width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent;"><i class="fa-solid fa-check"></i></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 700; color: white;">Dimanche : Immersion libre</span>
+                <span style="font-size: 11px; color: var(--text-secondary);">Lecture d'articles (Économie, Sport)</span>
+              </div>
+            </div>
+          </div>
+
+          <button id="routine-reset-btn" class="vocab-search" style="margin-top: 10px; background: transparent; border: 1px dashed var(--border-glass-focus); color: var(--text-secondary); font-weight: 600; cursor: pointer; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;"><i class="fa-solid fa-arrows-rotate"></i> Réinitialiser la semaine</button>
         </div>
       </div>
     </aside>

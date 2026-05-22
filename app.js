@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     activeScenario: null, // null, 'cafe', 'directions', 'technical', 'debate'
     scenarioGoals: [], // list of goal objects { id, text, regex, done }
     chatHistory: [],
-    speechVoice: null
+    speechVoice: null,
+    routineState: { Lundi: false, Mercredi: false, Vendredi: false, Dimanche: false }
   };
 
   // --- COMMON FRENCH GRAMMAR ERRORS DATABASE ---
@@ -109,13 +110,44 @@ document.addEventListener('DOMContentLoaded', () => {
     { word: "la fuite", translation: "leak", category: "home repairs", example: "Il y a une fuite d'eau importante sous la douche.", notes: "Feminine noun." },
     { word: "le chauffage", translation: "heating", category: "home repairs", example: "Le chauffage ne fonctionne pas, il fait froid ici.", notes: "Masculine noun." },
     { word: "le plombier", translation: "plumber", category: "home repairs", example: "J'ai appelé le plombier pour réparer les canalisations.", notes: "Masculine noun." },
-    { word: "réparer", translation: "to fix / repair", category: "home repairs", example: "Le propriétaire doit réparer la chaudière en panne.", notes: "Regular -er verb." }
+    { word: "réparer", translation: "to fix / repair", category: "home repairs", example: "Le propriétaire doit réparer la chaudière en panne.", notes: "Regular -er verb." },
+
+    // B1: Monde du Travail & l'Entreprise
+    { word: "la gestion de projets", translation: "project management", category: "workplace (B1)", example: "La gestion de projets demande beaucoup de rigueur et d'organisation.", notes: "Feminine noun phrase." },
+    { word: "l'incident technique", translation: "technical incident / issue", category: "workplace (B1)", example: "Le technicien a résolu l'incident technique en moins d'une heure.", notes: "Masculine noun phrase." },
+    { word: "la ressource humaine", translation: "human resource", category: "workplace (B1)", example: "Le département des ressources humaines gère les contrats.", notes: "Feminine noun." },
+    { word: "le télétravail", translation: "telecommuting / remote work", category: "workplace (B1)", example: "Le télétravail favorise une meilleure conciliation vie pro et perso.", notes: "Masculine noun." },
+    { word: "la vie de bureau", translation: "office life", category: "workplace (B1)", example: "Partager un café fait partie intégrante de la vie de bureau.", notes: "Feminine noun phrase." },
+
+    // B1: L'Environnement & les Transports (Mobilité douce)
+    { word: "le cyclisme urbain", translation: "urban cycling", category: "mobility (B1)", example: "Le cyclisme urbain se développe rapidement grâce aux pistes cyclables.", notes: "Masculine noun." },
+    { word: "le développement durable", translation: "sustainable development", category: "mobility (B1)", example: "Le développement durable préserve les ressources de notre planète.", notes: "Masculine noun." },
+    { word: "la piste cyclable", translation: "bike lane / path", category: "mobility (B1)", example: "Il est beaucoup plus sûr de rouler sur la piste cyclable.", notes: "Feminine noun." },
+    { word: "l'itinéraire", translation: "route / itinerary", category: "mobility (B1)", example: "Nous avons tracé un bel itinéraire pour notre voyage à vélo.", notes: "Masculine noun." },
+    { word: "l'écologie", translation: "ecology / environmentalism", category: "mobility (B1)", example: "L'écologie doit être au cœur des décisions politiques.", notes: "Feminine noun." },
+
+    // B1: Les Médias, la Technologie & l'IA
+    { word: "l'intelligence artificielle", translation: "artificial intelligence", category: "technology (B1)", example: "L'intelligence artificielle offre des solutions innovantes.", notes: "Feminine noun." },
+    { word: "l'automatisation", translation: "automation", category: "technology (B1)", example: "L'automatisation permet de libérer du temps pour les tâches créatives.", notes: "Feminine noun." },
+    { word: "la visualisation de données", translation: "data visualization", category: "technology (B1)", example: "La visualisation de données facilite la compréhension des métriques.", notes: "Feminine noun phrase." },
+    { word: "le réseau social", translation: "social network / media", category: "technology (B1)", example: "Chaque réseau social a ses propres codes et publics cibles.", notes: "Plural: les réseaux sociaux." },
+    { word: "l'actualité", translation: "news / current affairs", category: "technology (B1)", example: "Je consulte les journaux chaque matin pour suivre l'actualité.", notes: "Feminine noun (usually singular)." },
+
+    // B1: Les Loisirs & la Vie Quotidienne
+    { word: "le cricket", translation: "cricket (sport)", category: "leisure (B1)", example: "Le cricket est un sport d'équipe passionnant très populaire.", notes: "Masculine noun." },
+    { word: "le cyclotourisme", translation: "bicycle touring / cycle tourism", category: "leisure (B1)", example: "Le cyclotourisme combine activité physique et découverte du paysage.", notes: "Masculine noun." },
+    { word: "la sortie culturelle", translation: "cultural outing", category: "leisure (B1)", example: "Une sortie culturelle au musée d'art moderne est prévue ce samedi.", notes: "Feminine noun." },
+    { word: "les finances personnelles", translation: "personal finances", category: "leisure (B1)", example: "Gérer ses finances personnelles permet d'anticiper l'avenir.", notes: "Feminine plural noun." },
+    { word: "le budget", translation: "budget", category: "leisure (B1)", example: "Nous avons établi un budget mensuel strict pour nos loisirs.", notes: "Masculine noun." }
   ];
 
   const grammarLessonsData = [
     { title: "Passé Composé vs Imparfait", translation: "Completed action vs background details", category: "grammar", example: "Hier, je suis allé (PC) dehors parce qu'il faisait (Imparfait) beau.", notes: "Use Passé Composé for specific events, Imparfait for ongoing states." },
     { title: "Pronoms Disjonctifs", translation: "moi, toi, lui, elle, nous, vous, eux, elles", category: "grammar", example: "Viens chez moi ce soir avec lui !", notes: "Used after prepositions (pour, avec, sans) or for emphasis." },
-    { title: "Connecteurs Logiques", translation: "pourtant, donc, alors que, d'ailleurs", category: "grammar", example: "Il pleut, donc je prends mon parapluie ; pourtant, il fait chaud.", notes: "Essential connectors to sound fluent and structure B1 arguments." }
+    { title: "Connecteurs Logiques", translation: "pourtant, donc, alors que, d'ailleurs", category: "grammar", example: "Il pleut, donc je prends mon parapluie ; pourtant, il fait chaud.", notes: "Essential connectors to sound fluent and structure B1 arguments." },
+    { title: "Le Mode Subjonctif (Présent)", translation: "Expressing necessity, doubt, emotion, or will", category: "grammar (B1)", example: "Il faut que je sache gérer mon temps de travail.", notes: "Que + radical de la 3e pers. pluriel + e, es, e, ions, iez, ent" },
+    { title: "Pronoms Relatifs Composés", translation: "lequel, laquelle, auxquels, pour lesquels, etc.", category: "grammar (B1)", example: "C'est l'entreprise pour laquelle je travaille.", notes: "Used after prepositions to avoid repeating a noun" },
+    { title: "Expression de la Condition", translation: "Si + présent = futur / Si + imparfait = conditionnel", category: "grammar (B1)", example: "Si j'étudie chaque jour, j'obtiendrai mon DELF B1.", notes: "Formulating hypotheses for real or imaginary scenarios" }
   ];
 
   // --- SCENARIO DATASETS ---
@@ -236,9 +268,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // Right Panels Tabs & Cards
   const vocabTabTrigger = document.getElementById('vocab-tab-trigger');
   const grammarTabTrigger = document.getElementById('grammar-tab-trigger');
+  const delfTabTrigger = document.getElementById('delf-tab-trigger');
+  const routineTabTrigger = document.getElementById('routine-tab-trigger');
+
+  const vocabGrammarTabContent = document.getElementById('vocab-grammar-tab-content');
+  const delfTabContent = document.getElementById('delf-tab-content');
+  const routineTabContent = document.getElementById('routine-tab-content');
+
   const vocabSearchInput = document.getElementById('vocab-search-input');
   const vocabularyCardsList = document.getElementById('vocabulary-cards-list');
   const toastContainer = document.getElementById('achievement-toast-container');
+
+  // DELF Challenge Form references
+  const delfEssayInput = document.getElementById('delf-essay-input');
+  const essayWordCount = document.getElementById('essay-word-count');
+  const essayStatusLabel = document.getElementById('essay-status-label');
+  const delfEssaySubmitBtn = document.getElementById('delf-essay-submit-btn');
+
+  // DELF Oral references
+  const oralTimerText = document.getElementById('oral-timer-text');
+  const oralTimerToggleBtn = document.getElementById('oral-timer-toggle-btn');
+  const oralTimerResetBtn = document.getElementById('oral-timer-reset-btn');
+  const oralTranscriptDisplay = document.getElementById('oral-transcript-display');
+  const delfOralSubmitBtn = document.getElementById('delf-oral-submit-btn');
+
+  // Routine Checklist references
+  const routineProgressPercent = document.getElementById('routine-progress-percent');
+  const routineProgressFill = document.getElementById('routine-progress-fill');
+  const routineResetBtn = document.getElementById('routine-reset-btn');
+  const routineItems = document.querySelectorAll('.routine-item');
 
   // Skill Tree Nodes
   const nodeA1 = document.getElementById('node-a1');
@@ -347,24 +405,287 @@ document.addEventListener('DOMContentLoaded', () => {
     exitScenarioMode();
   });
 
-  // Vocabulary list tabs toggling
+  // --- TABS CONTROLLER ---
   vocabTabTrigger.addEventListener('click', () => {
-    vocabTabTrigger.classList.add('active');
-    grammarTabTrigger.classList.remove('active');
-    renderVocabulary('vocab');
+    switchTab('vocab');
   });
 
   grammarTabTrigger.addEventListener('click', () => {
-    grammarTabTrigger.classList.add('active');
-    vocabTabTrigger.classList.remove('active');
-    renderVocabulary('grammar');
+    switchTab('grammar');
   });
+
+  delfTabTrigger.addEventListener('click', () => {
+    switchTab('delf');
+  });
+
+  routineTabTrigger.addEventListener('click', () => {
+    switchTab('routine');
+  });
+
+  function switchTab(tabName) {
+    vocabTabTrigger.classList.remove('active');
+    grammarTabTrigger.classList.remove('active');
+    delfTabTrigger.classList.remove('active');
+    routineTabTrigger.classList.remove('active');
+
+    vocabGrammarTabContent.style.display = 'none';
+    delfTabContent.style.display = 'none';
+    routineTabContent.style.display = 'none';
+
+    // Restore search input visibility by default when switching tabs
+    vocabSearchInput.style.display = 'block';
+
+    if (tabName === 'vocab') {
+      vocabTabTrigger.classList.add('active');
+      vocabGrammarTabContent.style.display = 'flex';
+      renderVocabulary('vocab');
+    } else if (tabName === 'grammar') {
+      grammarTabTrigger.classList.add('active');
+      vocabGrammarTabContent.style.display = 'flex';
+      renderVocabulary('grammar');
+    } else if (tabName === 'delf') {
+      delfTabTrigger.classList.add('active');
+      delfTabContent.style.display = 'flex';
+      checkEssayCriteria();
+      checkOralCriteria();
+    } else if (tabName === 'routine') {
+      routineTabTrigger.classList.add('active');
+      routineTabContent.style.display = 'flex';
+      renderRoutineList();
+    }
+  }
 
   // Vocab search filter
   vocabSearchInput.addEventListener('input', (e) => {
     const text = e.target.value.toLowerCase().trim();
     const activeTab = vocabTabTrigger.classList.contains('active') ? 'vocab' : 'grammar';
     renderVocabulary(activeTab, text);
+  });
+
+  // --- DELF PRODUCTION ÉCRITE (ESSAI ARGUMENTÉ) ---
+  function checkEssayCriteria() {
+    const text = delfEssayInput.value.trim();
+    const words = text === '' ? [] : text.split(/\s+/);
+    const count = words.length;
+    essayWordCount.textContent = count;
+
+    const connectors = ["cependant", "de plus", "pourtant", "par conséquent", "d'ailleurs"];
+    let usedCount = 0;
+
+    connectors.forEach(conn => {
+      const badge = document.querySelector(`.connector-badge[data-connector="${conn}"]`);
+      let isPresent = false;
+      if (conn === "par conséquent") {
+        const regex = /\bpar\s+cons[eé]quent\b/i;
+        isPresent = regex.test(text);
+      } else {
+        const regex = new RegExp(`\\b${conn}\\b`, 'i');
+        isPresent = regex.test(text);
+      }
+
+      if (isPresent) {
+        badge.classList.add('active');
+        usedCount++;
+      } else {
+        badge.classList.remove('active');
+      }
+    });
+
+    const isWordCountOk = count >= 160;
+    const hasEnoughConnectors = usedCount >= 3; // Pedagogically flexible but rigorous B1 requirement
+
+    if (isWordCountOk && hasEnoughConnectors) {
+      delfEssaySubmitBtn.removeAttribute('disabled');
+      delfEssaySubmitBtn.style.background = 'var(--gradient-brand)';
+      delfEssaySubmitBtn.style.color = 'white';
+      delfEssaySubmitBtn.style.cursor = 'pointer';
+      essayStatusLabel.textContent = "Prêt !";
+      essayStatusLabel.style.color = "var(--color-success)";
+    } else {
+      delfEssaySubmitBtn.setAttribute('disabled', 'true');
+      delfEssaySubmitBtn.style.background = 'var(--border-glass)';
+      delfEssaySubmitBtn.style.color = 'var(--text-muted)';
+      delfEssaySubmitBtn.style.cursor = 'not-allowed';
+
+      if (!isWordCountOk && !hasEnoughConnectors) {
+        essayStatusLabel.textContent = "Incomplet (mots & connecteurs)";
+      } else if (!isWordCountOk) {
+        essayStatusLabel.textContent = "Incomplet (mots)";
+      } else {
+        essayStatusLabel.textContent = "Incomplet (connecteurs)";
+      }
+      essayStatusLabel.style.color = "var(--color-accent)";
+    }
+  }
+
+  delfEssayInput.addEventListener('input', checkEssayCriteria);
+
+  delfEssaySubmitBtn.addEventListener('click', () => {
+    awardXP(50);
+    triggerToast("ÉPREUVE ÉCRITE RÉUSSIE !", "Votre essai DELF B1 a été validé ! (+50 XP)", "fa-solid fa-trophy");
+    
+    // Reset essay text field and criteria UI
+    delfEssayInput.value = '';
+    checkEssayCriteria();
+
+    // Auto-check Vendredi: Écriture task in the weekly routine!
+    state.routineState.Vendredi = true;
+    saveStateToLocalStorage();
+    renderRoutineList();
+  });
+
+  // --- DELF PRODUCTION ORALE (CHRONO & SIMULATION) ---
+  let oralTimerInterval = null;
+  let oralTimerSeconds = 0;
+
+  function checkOralCriteria() {
+    const text = oralTranscriptDisplay.value.trim();
+    const wordCount = text === '' ? 0 : text.split(/\s+/).length;
+
+    // Must speak for at least 1 minute and transcript has to be >= 30 words
+    if (oralTimerSeconds >= 60 && wordCount >= 30) {
+      delfOralSubmitBtn.removeAttribute('disabled');
+      delfOralSubmitBtn.style.background = 'var(--gradient-brand)';
+      delfOralSubmitBtn.style.color = 'white';
+      delfOralSubmitBtn.style.cursor = 'pointer';
+    } else {
+      delfOralSubmitBtn.setAttribute('disabled', 'true');
+      delfOralSubmitBtn.style.background = 'var(--border-glass)';
+      delfOralSubmitBtn.style.color = 'var(--text-muted)';
+      delfOralSubmitBtn.style.cursor = 'not-allowed';
+    }
+  }
+
+  oralTimerToggleBtn.addEventListener('click', () => {
+    if (oralTimerInterval) {
+      stopOralPractice();
+    } else {
+      startOralPractice();
+    }
+  });
+
+  oralTimerResetBtn.addEventListener('click', () => {
+    stopOralPractice();
+    oralTimerSeconds = 0;
+    oralTimerText.textContent = "00:00";
+    oralTimerText.classList.remove('oral-timer-active');
+    oralTranscriptDisplay.value = '';
+    checkOralCriteria();
+  });
+
+  function startOralPractice() {
+    state.isOralPracticeActive = true;
+    oralTimerText.classList.add('oral-timer-active');
+    oralTimerToggleBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+
+    oralTimerInterval = setInterval(() => {
+      oralTimerSeconds++;
+      const mins = String(Math.floor(oralTimerSeconds / 60)).padStart(2, '0');
+      const secs = String(oralTimerSeconds % 60).padStart(2, '0');
+      oralTimerText.textContent = `${mins}:${secs}`;
+      checkOralCriteria();
+    }, 1000);
+
+    if (speechRecognition) {
+      try {
+        speechRecognition.start();
+      } catch (err) {
+        console.warn("Speech Recognition already active or error:", err);
+      }
+    }
+    triggerToast("Chrono Oral Lancé", "Parlez pour dicter votre monologue en direct !", "fa-solid fa-microphone");
+  }
+
+  function stopOralPractice() {
+    state.isOralPracticeActive = false;
+    oralTimerText.classList.remove('oral-timer-active');
+    oralTimerToggleBtn.innerHTML = '<i class="fa-solid fa-play"></i> Démarrer';
+
+    if (oralTimerInterval) {
+      clearInterval(oralTimerInterval);
+      oralTimerInterval = null;
+    }
+
+    if (speechRecognition) {
+      try {
+        speechRecognition.stop();
+      } catch (err) {}
+    }
+  }
+
+  delfOralSubmitBtn.addEventListener('click', () => {
+    stopOralPractice();
+    awardXP(30);
+    triggerToast("EXPRESSION ORALE RÉUSSIE !", "Votre monologue de pratique DELF B1 a été validé ! (+30 XP)", "fa-solid fa-trophy");
+
+    oralTimerSeconds = 0;
+    oralTimerText.textContent = "00:00";
+    oralTranscriptDisplay.value = '';
+    checkOralCriteria();
+
+    // Auto-check Mercredi: Écoute Active / Expression task in the weekly routine!
+    state.routineState.Mercredi = true;
+    saveStateToLocalStorage();
+    renderRoutineList();
+  });
+
+  // --- ROUTINE HEBDOMADAIRE B1 CHECKLIST ---
+  function renderRoutineList() {
+    let completedCount = 0;
+    const totalCount = 4;
+
+    routineItems.forEach(item => {
+      const day = item.getAttribute('data-day');
+      const isCompleted = state.routineState[day];
+      const checkbox = item.querySelector('.goal-checkbox');
+
+      if (isCompleted) {
+        item.classList.add('completed');
+        checkbox.style.color = 'white';
+        completedCount++;
+      } else {
+        item.classList.remove('completed');
+        checkbox.style.color = 'transparent';
+      }
+    });
+
+    const percent = Math.round((completedCount / totalCount) * 100);
+    routineProgressPercent.textContent = `${percent}%`;
+    routineProgressFill.style.width = `${percent}%`;
+
+    // Award +50 XP bonus for completing the routine
+    if (percent === 100 && !state.routineBonusClaimed) {
+      state.routineBonusClaimed = true;
+      awardXP(50);
+      triggerToast("ROUTINE HEBDO VALIDE !", "Vous avez complété toute votre routine d'étude B1 ! (+50 XP)", "fa-solid fa-award");
+      saveStateToLocalStorage();
+    }
+  }
+
+  routineItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const day = item.getAttribute('data-day');
+      state.routineState[day] = !state.routineState[day];
+
+      if (!state.routineState[day]) {
+        state.routineBonusClaimed = false;
+      }
+
+      saveStateToLocalStorage();
+      renderRoutineList();
+
+      triggerToast(state.routineState[day] ? "Tâche validée !" : "Tâche décochée", `${day} mis à jour.`, state.routineState[day] ? "fa-solid fa-circle-check" : "fa-solid fa-circle-xmark");
+    });
+  });
+
+  routineResetBtn.addEventListener('click', () => {
+    if (confirm("Voulez-vous réinitialiser votre progression hebdomadaire pour une nouvelle semaine ?")) {
+      state.routineState = { Lundi: false, Mercredi: false, Vendredi: false, Dimanche: false };
+      state.routineBonusClaimed = false;
+      saveStateToLocalStorage();
+      renderRoutineList();
+      triggerToast("Routine Réinitialisée", "Bonne chance pour votre nouvelle semaine d'étude !", "fa-solid fa-calendar-days");
+    }
   });
 
   // Speech Recognition (Speech-to-Text) handler
@@ -380,23 +701,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
       speechRecognition.onstart = () => {
         voiceInputBtn.classList.add('recording');
-        triggerToast("Écoute Active", "Parlez en français maintenant...", "fa-solid fa-microphone");
+        if (!state.isOralPracticeActive) {
+          triggerToast("Écoute Active", "Parlez en français maintenant...", "fa-solid fa-microphone");
+        }
       };
 
       speechRecognition.onresult = (e) => {
         const text = e.results[0][0].transcript;
-        messageTextInput.value = text;
-        messageTextInput.focus();
+        if (state.isOralPracticeActive) {
+          oralTranscriptDisplay.value += (oralTranscriptDisplay.value ? " " : "") + text;
+          checkOralCriteria();
+        } else {
+          messageTextInput.value = text;
+          messageTextInput.focus();
+        }
       };
 
       speechRecognition.onerror = (e) => {
         console.error("Speech Recognition Error:", e);
         voiceInputBtn.classList.remove('recording');
-        triggerToast("Erreur d'écoute", "Impossible de capter votre voix. Réessayez.", "fa-solid fa-triangle-exclamation");
+        if (!state.isOralPracticeActive) {
+          triggerToast("Erreur d'écoute", "Impossible de capter votre voix. Réessayez.", "fa-solid fa-triangle-exclamation");
+        }
       };
 
       speechRecognition.onend = () => {
         voiceInputBtn.classList.remove('recording');
+        if (state.isOralPracticeActive) {
+          // Restart speech recognition automatically for continuous monologue tracking
+          try {
+            speechRecognition.start();
+          } catch (err) {}
+        }
       };
     } else {
       voiceInputBtn.style.display = 'none'; // Hide button if Speech Recognition is not supported
@@ -800,14 +1136,263 @@ document.addEventListener('DOMContentLoaded', () => {
     return "C'est très intéressant ce que vous racontez ! J'apprécie beaucoup notre conversation. Dites-m'en plus sur ce sujet, ou alors posez-moi une question sur le vocabulaire !";
   }
 
+  // --- B1 GRAMMAR QUIZ SYSTEM ---
+  const quizQuestions = [
+    {
+      question: "Complétez la phrase : Il faut absolument que nous _________ les échéances de notre projet.",
+      options: [
+        "respectons",
+        "respections",
+        "respecterons",
+        "avons respecté"
+      ],
+      correctIndex: 1,
+      explanation: "Après la locution impersonnelle 'Il faut que', on doit utiliser le subjonctif présent. Pour 'nous', la terminaison régulière est '-ions' (respections)."
+    },
+    {
+      question: "Soudain, pendant que je __________ dans le salon, un incident technique __________ la réunion de travail.",
+      options: [
+        "travaillais / a interrompu",
+        "ai travaillé / interrompait",
+        "travaillerais / interrompt",
+        "travaillais / interrompait"
+      ],
+      correctIndex: 0,
+      explanation: "L'imparfait (travaillais) décrit une action continue en arrière-plan (décor), tandis que le passé composé (a interrompu) exprime un événement soudain et délimité dans le temps."
+    },
+    {
+      question: "Choisissez le pronom relatif composé correct : C'est le dossier de gestion pour __________ j'ai passé des heures de recherche.",
+      options: [
+        "auquel",
+        "lequel",
+        "dont",
+        "laquelle"
+      ],
+      correctIndex: 1,
+      explanation: "'Dossier' est masculin singulier. Après la préposition 'pour', on emploie le pronom relatif composé masculin singulier 'lequel'."
+    },
+    {
+      question: "Complétez : Mes collègues de bureau sont partis déjeuner sans __________ car je devais terminer un rapport urgent.",
+      options: [
+        "me",
+        "je",
+        "moi",
+        "mon"
+      ],
+      correctIndex: 2,
+      explanation: "Après une préposition comme 'sans', 'avec', 'pour', 'chez', on utilise obligatoirement un pronom disjonctif (moi, toi, lui, elle, nous, vous, eux, elles)."
+    },
+    {
+      question: "Complétez l'hypothèse imaginaire : Si le gouvernement __________ davantage le cyclisme urbain, les citoyens __________ moins leur voiture.",
+      options: [
+        "encourage / utiliseraient",
+        "encourageait / utiliseraient",
+        "encouragerait / utiliseraient",
+        "encourageait / utiliseront"
+      ],
+      correctIndex: 1,
+      explanation: "Pour exprimer une hypothèse potentielle ou imaginaire au présent, on utilise la structure : Si + Imparfait (encourageait) ➔ Conditionnel Présent (utiliseraient)."
+    },
+    {
+      question: "Complétez la double subjonctive : Bien que l'intelligence artificielle __________ très utile, il faut que nous __________ vigilants.",
+      options: [
+        "est / soyons",
+        "soit / soyons",
+        "soit / sommes",
+        "sera / serons"
+      ],
+      correctIndex: 1,
+      explanation: "La conjonction de concession 'Bien que' et l'obligation 'Il faut que' régissent toutes deux le subjonctif présent : 'soit' (être, 3e pers. sing.) et 'soyons' (être, 1e pers. plur.)."
+    }
+  ];
+
+  function startGrammarQuiz() {
+    vocabSearchInput.style.display = 'none';
+    const quizState = {
+      index: 0,
+      score: 0,
+      questions: [...quizQuestions]
+    };
+    renderQuizQuestion(quizState);
+  }
+
+  function renderQuizQuestion(quizState) {
+    vocabularyCardsList.innerHTML = '';
+    const currentQ = quizState.questions[quizState.index];
+    
+    const quizContainer = document.createElement('div');
+    quizContainer.className = 'quiz-container';
+
+    const quizHeader = document.createElement('div');
+    quizHeader.className = 'quiz-header';
+    quizHeader.innerHTML = `
+      <span>Question ${quizState.index + 1} sur ${quizState.questions.length}</span>
+      <span>Score: ${quizState.score * 10} XP</span>
+    `;
+    quizContainer.appendChild(quizHeader);
+
+    const quizQuestion = document.createElement('div');
+    quizQuestion.className = 'quiz-question';
+    quizQuestion.textContent = currentQ.question;
+    quizContainer.appendChild(quizQuestion);
+
+    const quizOptions = document.createElement('div');
+    quizOptions.className = 'quiz-options';
+
+    currentQ.options.forEach((opt, idx) => {
+      const optionBtn = document.createElement('button');
+      optionBtn.className = 'quiz-option-btn';
+      optionBtn.textContent = opt;
+      optionBtn.addEventListener('click', () => {
+        handleQuizAnswer(quizState, idx, optionBtn, quizOptions);
+      });
+      quizOptions.appendChild(optionBtn);
+    });
+
+    quizContainer.appendChild(quizOptions);
+    vocabularyCardsList.appendChild(quizContainer);
+  }
+
+  function handleQuizAnswer(quizState, selectedIdx, clickedBtn, optionsContainer) {
+    const currentQ = quizState.questions[quizState.index];
+    const allBtns = optionsContainer.querySelectorAll('.quiz-option-btn');
+    
+    allBtns.forEach(btn => btn.setAttribute('disabled', 'true'));
+
+    const isCorrect = selectedIdx === currentQ.correctIndex;
+    
+    if (isCorrect) {
+      clickedBtn.classList.add('correct');
+      quizState.score++;
+      awardXP(10);
+      triggerToast("Bonne Réponse !", "+10 XP !", "fa-solid fa-circle-check");
+    } else {
+      clickedBtn.classList.add('wrong');
+      allBtns[currentQ.correctIndex].classList.add('correct');
+      triggerToast("Mauvaise Réponse", "Voyez l'explication ci-dessous.", "fa-solid fa-circle-xmark");
+    }
+
+    const container = clickedBtn.closest('.quiz-container');
+    
+    const explanationDiv = document.createElement('div');
+    explanationDiv.className = 'quiz-explanation';
+    explanationDiv.innerHTML = `
+      <div style="font-weight: 700; margin-bottom: 4px; color: ${isCorrect ? 'var(--color-success)' : 'var(--color-accent)'};">
+        <i class="${isCorrect ? 'fa-solid fa-check' : 'fa-solid fa-xmark'}"></i> ${isCorrect ? 'Correct !' : 'Incorrect'}
+      </div>
+      <div>${currentQ.explanation}</div>
+    `;
+    container.appendChild(explanationDiv);
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'vocab-search';
+    nextBtn.style = 'margin-top: 12px; background: var(--gradient-brand); color: white; border: none; font-weight: 700; cursor: pointer; padding: 10px; transition: all var(--transition-fast); width: 100%;';
+    
+    const isLast = quizState.index === quizState.questions.length - 1;
+    nextBtn.textContent = isLast ? "Voir les résultats" : "Question suivante";
+    
+    nextBtn.addEventListener('click', () => {
+      if (isLast) {
+        renderQuizResults(quizState);
+      } else {
+        quizState.index++;
+        renderQuizQuestion(quizState);
+      }
+    });
+
+    container.appendChild(nextBtn);
+  }
+
+  function renderQuizResults(quizState) {
+    vocabularyCardsList.innerHTML = '';
+    vocabSearchInput.style.display = 'block';
+
+    const totalQuestions = quizState.questions.length;
+    const finalScore = quizState.score;
+    const finalPercent = Math.round((finalScore / totalQuestions) * 100);
+    const xpGained = finalScore * 10;
+
+    const resultsContainer = document.createElement('div');
+    resultsContainer.className = 'quiz-container';
+    resultsContainer.style = 'text-align: center; padding: 24px 16px; gap: 16px;';
+
+    let titleText = "Entraînement Terminé !";
+    let message = "Excellent travail ! Vous renforcez vos bases B1.";
+    let icon = "fa-solid fa-graduation-cap";
+
+    if (finalPercent === 100) {
+      titleText = "Sans Faute ! Magnifique !";
+      message = "Un score parfait ! Vous maîtrisez la grammaire B1 à la perfection.";
+      icon = "fa-solid fa-crown";
+    } else if (finalPercent >= 70) {
+      titleText = "Très bien joué !";
+      message = "Excellente performance. Vos structures complexes de grammaire s'améliorent.";
+      icon = "fa-solid fa-star";
+    }
+
+    resultsContainer.innerHTML = `
+      <div style="font-size: 40px; color: var(--color-warning); margin-bottom: 6px;">
+        <i class="${icon}"></i>
+      </div>
+      <div style="font-size: 16px; font-weight: 800; color: white;">${titleText}</div>
+      <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">${message}</div>
+      
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 12px; margin: 8px 0; display: flex; justify-content: space-around; align-items: center;">
+        <div style="display: flex; flex-direction: column;">
+          <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Score</span>
+          <span style="font-size: 20px; font-weight: 800; color: white;">${finalScore} / ${totalQuestions}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; border-left: 1px solid var(--border-glass); padding-left: 20px;">
+          <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">XP Gagnés</span>
+          <span style="font-size: 20px; font-weight: 800; color: var(--color-primary);">+${xpGained} XP</span>
+        </div>
+      </div>
+
+      <button id="finish-quiz-btn" class="vocab-search" style="background: var(--gradient-brand); color: white; border: none; font-weight: 700; cursor: pointer; padding: 12px; transition: all var(--transition-fast); width: 100%;">Retour aux Leçons</button>
+    `;
+
+    vocabularyCardsList.appendChild(resultsContainer);
+
+    document.getElementById('finish-quiz-btn').addEventListener('click', () => {
+      renderVocabulary('grammar');
+    });
+
+    state.routineState.Lundi = true;
+    saveStateToLocalStorage();
+    renderRoutineList();
+  }
+
   // --- FLASHCARDS TAB SYSTEMS ---
 
   function renderVocabulary(tabName, filterText = "") {
     vocabularyCardsList.innerHTML = '';
     const activeData = tabName === 'vocab' ? vocabularyData : grammarLessonsData;
 
+    // Prepends Grammar Quiz CTA in the grammar tab when not searching
+    if (tabName === 'grammar' && !filterText) {
+      const quizCtaCard = document.createElement('div');
+      quizCtaCard.className = 'quiz-cta-container';
+      quizCtaCard.style = 'background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%); border: 1px solid var(--border-glass-focus); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; text-align: center; box-shadow: var(--shadow-sm);';
+      quizCtaCard.innerHTML = `
+        <span style="font-size: 13px; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;"><i class="fa-solid fa-circle-question" style="color: var(--color-primary);"></i> Défi de Grammaire B1</span>
+        <span style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">Prêt à vous tester sur le subjonctif, l'imparfait, les pronoms relatifs et les hypothèses ?</span>
+        <button id="start-grammar-quiz-btn" class="vocab-search" style="margin-top: 4px; background: var(--gradient-brand); color: white; border: none; font-weight: 700; cursor: pointer; transition: all var(--transition-fast); padding: 8px; width: 100%;">Lancer le Quiz (+10 XP / Q)</button>
+      `;
+      vocabularyCardsList.appendChild(quizCtaCard);
+
+      // Hook up start button
+      setTimeout(() => {
+        const startQuizBtn = document.getElementById('start-grammar-quiz-btn');
+        if (startQuizBtn) {
+          startQuizBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            startGrammarQuiz();
+          });
+        }
+      }, 0);
+    }
+
     activeData.forEach(item => {
-      // Filter search match
       const wordVal = (item.word || item.title).toLowerCase();
       const translVal = item.translation.toLowerCase();
       if (filterText && !wordVal.includes(filterText) && !translVal.includes(filterText)) {
@@ -837,7 +1422,6 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
       } else {
-        // Grammar rules card
         card.innerHTML = `
           <div class="vocab-card-inner">
             <div class="vocab-card-front">
@@ -854,14 +1438,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
 
-      // Flip card action
       card.addEventListener('click', (e) => {
-        // Prevent flipping when clicking standard speech speaker icon
         if (e.target.closest('.vocab-pronounce-btn')) return;
         card.classList.toggle('flipped');
       });
 
-      // Text-to-Speech button action on card
       const pronounceBtn = card.querySelector('.vocab-pronounce-btn');
       if (pronounceBtn) {
         pronounceBtn.addEventListener('click', (e) => {
@@ -1022,6 +1603,8 @@ document.addEventListener('DOMContentLoaded', () => {
         state.isSlowSpeech = parsed.isSlowSpeech !== undefined ? parsed.isSlowSpeech : false;
         state.currentAccent = parsed.currentAccent || 'fr-FR';
         state.chatHistory = parsed.chatHistory || [];
+        state.routineState = parsed.routineState || { Lundi: false, Mercredi: false, Vendredi: false, Dimanche: false };
+        state.routineBonusClaimed = parsed.routineBonusClaimed !== undefined ? parsed.routineBonusClaimed : false;
         
         // Update view UI based on cached settings
         xpCounter.textContent = state.xp;
@@ -1038,6 +1621,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Local Storage Parsing Error:", err);
       }
     }
+    // Synchronize weekly routine checklist view with state on startup
+    renderRoutineList();
   }
 
 });
