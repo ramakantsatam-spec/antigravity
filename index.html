@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>French Language Coach - Antoinette AI</title>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- HEADER PANEL -->
+    <header class="app-header glass-panel">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <i class="fa-solid fa-graduation-cap" style="color: white;"></i>
+        </div>
+        <div class="brand-name">Coaching de Français</div>
+      </div>
+
+      <div class="user-progress-bar">
+        <!-- XP Indicator -->
+        <div class="stat-badge xp-badge" title="Points d'expérience gagnés">
+          <i class="fa-solid fa-bolt"></i>
+          <span id="xp-counter">0</span> XP
+        </div>
+        
+        <!-- CEFR Indicator -->
+        <div class="stat-badge cefr-badge" id="cefr-indicator-badge" title="Niveau actuel du Cadre Européen (CECR)">
+          <i class="fa-solid fa-trophy" style="margin-right: 6px;"></i>
+          <span id="cefr-level-text">A1 Débutant</span>
+        </div>
+      </div>
+
+      <!-- Speech & Audio Configuration Controls -->
+      <div class="audio-settings">
+        <!-- Accent Mode -->
+        <button class="control-btn" id="accent-toggle-btn" title="Changer d'accent (Parisien / Canadien)" style="width: auto; padding: 0 12px; gap: 6px; font-size: 13px; font-weight: 600;">
+          <i class="fa-solid fa-earth-americas"></i> <span id="accent-label">FR (FR)</span>
+        </button>
+
+        <!-- Speech speed -->
+        <button class="control-btn" id="speech-speed-btn" title="Vitesse d'élocution (Normale / Lente)">
+          <i class="fa-solid fa-gauge-high" id="speech-speed-icon"></i>
+        </button>
+
+        <!-- Global TTS sound toggle -->
+        <button class="control-btn active" id="audio-toggle-btn" title="Activer / Désactiver la synthèse vocale automatique">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- LEFT SIDEBAR: CEFR & PROGRESS SYSTEM -->
+    <aside class="left-sidebar glass-panel">
+      <!-- Progression tracker -->
+      <div class="progress-meter">
+        <div class="progress-label-row">
+          <span>Progression Globale</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="global-progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- CEFR Skill Nodes Mapping -->
+      <div>
+        <div class="section-title">Arbre de Compétences (CECR)</div>
+        <div class="skill-tree">
+          
+          <!-- Node 1: A1 - Foundations -->
+          <div class="skill-node completed active-node" id="node-a1" data-level="A1">
+            <div class="skill-icon">A1</div>
+            <div class="skill-details">
+              <span class="skill-title">Bases Usuelles</span>
+              <span class="skill-desc">Se présenter, commander un café, saluer</span>
+            </div>
+          </div>
+
+          <!-- Node 2: A2 - Everyday Life -->
+          <div class="skill-node" id="node-a2" data-level="A2">
+            <div class="skill-icon">A2</div>
+            <div class="skill-details">
+              <span class="skill-title">Récits & Description</span>
+              <span class="skill-desc">Passé composé, directions, projets</span>
+            </div>
+          </div>
+
+          <!-- Node 3: B1 - Autonomy -->
+          <div class="skill-node locked" id="node-b1" data-level="B1">
+            <div class="skill-icon"><i class="fa-solid fa-lock"></i></div>
+            <div class="skill-details">
+              <span class="skill-title">Autonomie Seuil</span>
+              <span class="skill-desc">Résolution d'incidents, débats fluides</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Scenario Shortcuts Section -->
+      <div>
+        <div class="section-title">Scénarios Rapides</div>
+        <div class="scenarios-list">
+          <div class="scenario-link" data-scenario="cafe">
+            <span><i class="fa-solid fa-mug-hot" style="margin-right: 8px;"></i> Au Café Parisien</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+          <div class="scenario-link" data-scenario="directions">
+            <span><i class="fa-solid fa-map-location-dot" style="margin-right: 8px;"></i> Demander son Chemin</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+          <div class="scenario-link" data-scenario="technical">
+            <span><i class="fa-solid fa-wrench" style="margin-right: 8px;"></i> Problème de Logement</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+          <div class="scenario-link" data-scenario="debate">
+            <span><i class="fa-solid fa-comments" style="margin-right: 8px;"></i> Un Débat Amical</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER PANEL: CHAT APPLICATION -->
+    <main class="main-chat-panel">
+      <!-- Active Scenario Goal Banner -->
+      <div class="scenario-banner-active" id="active-scenario-banner" style="display: none;">
+        <div class="scenario-title-active">
+          <i class="fa-solid fa-flag-checkered"></i> Scénario Actif : <span id="active-scenario-name">...</span>
+        </div>
+        <button class="scenario-exit-btn" id="exit-scenario-btn">
+          <i class="fa-solid fa-xmark"></i> Quitter le scénario
+        </button>
+      </div>
+
+      <!-- Coach Identity Header -->
+      <div class="chat-banner">
+        <div class="coach-identity">
+          <div class="avatar-wrapper">
+            <div class="coach-avatar">👩‍🏫</div>
+            <div class="active-dot"></div>
+          </div>
+          <div class="coach-details">
+            <span class="coach-name">Antoinette</span>
+            <span class="coach-status" id="coach-status-subtext">Votre coach de français personnelle</span>
+          </div>
+        </div>
+        
+        <button class="control-btn" id="clear-chat-btn" title="Réinitialiser la conversation">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+
+      <!-- Chat Scrolling Area -->
+      <div class="chat-scroller" id="chat-messages-container">
+        <!-- Message template loaded dynamically by JS -->
+      </div>
+
+      <!-- Chat Input Interface -->
+      <div class="chat-input-container">
+        <!-- Quick command helpers -->
+        <div class="quick-cmds">
+          <span class="cmd-badge" data-cmd="cmd:vocab"><i class="fa-solid fa-book"></i> cmd:vocab</span>
+          <span class="cmd-badge" data-cmd="cmd:scenario cafe"><i class="fa-solid fa-mug-hot"></i> cmd:scenario cafe</span>
+          <span class="cmd-badge" data-cmd="cmd:scenario directions"><i class="fa-solid fa-map-location-dot"></i> cmd:scenario directions</span>
+          <span class="cmd-badge" data-cmd="cmd:scenario technical"><i class="fa-solid fa-wrench"></i> cmd:scenario technical</span>
+        </div>
+
+        <form class="chat-input-form" id="chat-form" style="margin-top: 10px;">
+          <!-- Mic / Voice Dictation Button -->
+          <button type="button" class="action-btn mic-btn" id="voice-input-btn" title="Parler en français (Speech-to-Text)">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+
+          <!-- Input Text Field -->
+          <input type="text" class="chat-input" id="message-text-input" placeholder="Écrivez votre message en français ici..." autocomplete="off">
+
+          <!-- Submit Action Buttons -->
+          <div class="action-buttons-group">
+            <button type="submit" class="action-btn send-btn" id="send-msg-btn" title="Envoyer le message">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR: SCENARIO GOALS & FLASHCARDS -->
+    <aside class="right-sidebar glass-panel">
+      <!-- Active Goals Target Checklist (Visible during Scenario Mode) -->
+      <div class="scenario-goals-container" id="scenario-goals-card" style="display: none;">
+        <span class="section-title" style="margin-bottom: 6px;"><i class="fa-solid fa-list-check" style="margin-right: 6px;"></i> Objectifs du Scénario</span>
+        <div id="scenario-goals-list">
+          <!-- Dynamic goal list checkboxes loaded by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Thematic Vocabulary Flashcards Panel -->
+      <div style="display: flex; flex-direction: column; flex: 1; gap: 14px; overflow: hidden;">
+        <div class="tabs-header">
+          <button class="tab-btn active" id="vocab-tab-trigger">Vocabulaire</button>
+          <button class="tab-btn" id="grammar-tab-trigger">Grammaire</button>
+        </div>
+
+        <!-- Vocabulary Search -->
+        <input type="text" class="vocab-search" id="vocab-search-input" placeholder="Rechercher un mot...">
+
+        <!-- Dynamic Flashcards Scroller -->
+        <div class="vocab-scroll-list" id="vocabulary-cards-list">
+          <!-- Loaded by JS -->
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Dynamic Confetti / Achievement Container -->
+  <div id="achievement-toast-container"></div>
+
+  <!-- JavaScript Main App Controller -->
+  <script src="app.js"></script>
+</body>
+</html>
